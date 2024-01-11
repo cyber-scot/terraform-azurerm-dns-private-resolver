@@ -39,7 +39,6 @@ module "network" {
   }
 }
 
-
 module "resolver" {
   source = "cyber-scot/dns-private-resolver/azurerm"
 
