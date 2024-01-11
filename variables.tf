@@ -10,10 +10,8 @@ variable "dns_forwarding_rulesets" {
       create_ruleset        = optional(bool, true)
       create_rules          = optional(bool, true)
       name                  = string
-      forwarding_servers    = list(string)
       outbound_endpoint_ids = optional(list(string))
       vnet_link_name        = optional(string)
-      vnet_id               = optional(string)
       metadata              = optional(map(string))
       rules = optional(list(object({
         name        = string
@@ -26,7 +24,6 @@ variable "dns_forwarding_rulesets" {
         }))
         forwarding_port     = optional(number)
         forwarding_protocol = optional(string, "TCP")
-        metadata            = optional(map(string))
       })))
   }))
   description = "The list of DNS forwarding rulesets"
@@ -36,7 +33,7 @@ variable "dns_forwarding_rulesets" {
 variable "inbound_endpoint_ip_configurations" {
   type = list(object(
     {
-      private_ip_address_allocation = optional(string, "Dynamic")
+      private_ip_allocation_method = optional(string, "Dynamic")
       subnet_id                     = string
   }))
   description = "The list of inbound endpoint ip configurations"
