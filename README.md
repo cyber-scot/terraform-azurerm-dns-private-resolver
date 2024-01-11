@@ -44,32 +44,34 @@ resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
 }
 
 locals {
-  all_rules = toset(flatten([
-    for ruleset_key, ruleset_value in var.dns_forwarding_rulesets : [
-      for rule in ruleset_value.rules : {
+  all_rules = merge([
+    for ruleset_key, ruleset_value in var.dns_forwarding_rulesets : {
+      for idx, rule in ruleset_value.rules : "${ruleset_key}-${idx}" => {
         ruleset_key = ruleset_key
         rule        = rule
       }
-    ]
-  ]))
+    }
+  ]...)
 }
 
+
 resource "azurerm_private_dns_resolver_forwarding_rule" "rules" {
-  for_each                  = { for k, v in local.all_rules : k => v if v.rule.create_ruleset == true }
-  name                      = each.value.name
-  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset[each.key].id
-  domain_name               = each.value.domain_name
-  enabled                   = each.value.enabled
-  metadata                  = merge(var.tags, each.value.metadata)
+  for_each                  = local.all_rules
+  name                      = each.value.rule.name
+  dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset[each.value.ruleset_key].id
+  domain_name               = each.value.rule.domain_name
+  enabled                   = each.value.rule.enabled
+  metadata                  = merge(var.tags, each.value.rule.metadata)
 
   dynamic "target_dns_servers" {
-    for_each = each.value.target_dns_servers
+    for_each = each.value.rule.target_dns_servers
     content {
       ip_address = target_dns_servers.value.ip_address
       port       = target_dns_servers.value.port
     }
   }
 }
+
 
 resource "azurerm_private_dns_resolver_virtual_network_link" "vnet_link" {
   for_each                  = { for k, v in var.dns_forwarding_rulesets : k => v if v.create_ruleset == true }
