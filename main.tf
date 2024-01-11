@@ -49,7 +49,6 @@ locals {
   ]))
 }
 
-
 resource "azurerm_private_dns_resolver_forwarding_rule" "rules" {
   for_each                  = { for k, v in local.all_rules : k => v if v.rule.create_ruleset == true }
   name                      = each.value.name

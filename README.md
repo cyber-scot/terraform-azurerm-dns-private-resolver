@@ -50,7 +50,6 @@ locals {
   ]))
 }
 
-
 resource "azurerm_private_dns_resolver_forwarding_rule" "rules" {
   for_each                  = { for k, v in local.all_rules : k => v if v.rule.create_ruleset == true }
   name                      = each.value.name
@@ -119,4 +118,17 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_dns_forwarding_ruleset_ids"></a> [dns\_forwarding\_ruleset\_ids](#output\_dns\_forwarding\_ruleset\_ids) | A map of DNS Forwarding Ruleset IDs, keyed by the ruleset name. |
+| <a name="output_dns_forwarding_ruleset_names"></a> [dns\_forwarding\_ruleset\_names](#output\_dns\_forwarding\_ruleset\_names) | A map of DNS Forwarding Ruleset names, keyed by the ruleset name. |
+| <a name="output_forwarding_rule_ids"></a> [forwarding\_rule\_ids](#output\_forwarding\_rule\_ids) | A map of forwarding rule IDs for the DNS resolver, keyed by the rule name. |
+| <a name="output_forwarding_rule_names"></a> [forwarding\_rule\_names](#output\_forwarding\_rule\_names) | A map of forwarding rule names for the DNS resolver, keyed by the rule name. |
+| <a name="output_inbound_endpoint_id"></a> [inbound\_endpoint\_id](#output\_inbound\_endpoint\_id) | The ID of the inbound endpoint associated with the Azure Private DNS Resolver. |
+| <a name="output_inbound_endpoint_name"></a> [inbound\_endpoint\_name](#output\_inbound\_endpoint\_name) | The name of the inbound endpoint associated with the Azure Private DNS Resolver. |
+| <a name="output_outbound_endpoint_id"></a> [outbound\_endpoint\_id](#output\_outbound\_endpoint\_id) | The ID of the outbound endpoint associated with the Azure Private DNS Resolver. |
+| <a name="output_outbound_endpoint_name"></a> [outbound\_endpoint\_name](#output\_outbound\_endpoint\_name) | The name of the outbound endpoint associated with the Azure Private DNS Resolver. |
+| <a name="output_private_dns_resolver_id"></a> [private\_dns\_resolver\_id](#output\_private\_dns\_resolver\_id) | The ID of the Azure Private DNS Resolver. |
+| <a name="output_private_dns_resolver_name"></a> [private\_dns\_resolver\_name](#output\_private\_dns\_resolver\_name) | The name of the Azure Private DNS Resolver. |
+| <a name="output_virtual_network_link_ids"></a> [virtual\_network\_link\_ids](#output\_virtual\_network\_link\_ids) | A map of Virtual Network Link IDs for the DNS resolver, keyed by the link name. |
+| <a name="output_virtual_network_link_names"></a> [virtual\_network\_link\_names](#output\_virtual\_network\_link\_names) | A map of Virtual Network Link names for the DNS resolver, keyed by the link name. |
