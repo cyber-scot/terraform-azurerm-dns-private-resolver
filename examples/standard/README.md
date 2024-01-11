@@ -42,7 +42,7 @@ module "network" {
 
 
 module "resolver" {
-  source = "../../"
+  source = "cyber-scot/dns-private-resolver/azurerm"
 
   rg_name  = module.rg.rg_name
   location = module.rg.rg_location
@@ -114,7 +114,7 @@ No requirements.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_network"></a> [network](#module\_network) | cyber-scot/network/azurerm | n/a |
-| <a name="module_resolver"></a> [resolver](#module\_resolver) | ../../ | n/a |
+| <a name="module_resolver"></a> [resolver](#module\_resolver) | cyber-scot/dns-private-resolver/azurerm | n/a |
 | <a name="module_rg"></a> [rg](#module\_rg) | cyber-scot/rg/azurerm | n/a |
 
 ## Resources
