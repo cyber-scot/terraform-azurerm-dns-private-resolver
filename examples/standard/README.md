@@ -65,7 +65,7 @@ module "resolver" {
       rules = [
         {
           name        = "rule1"
-          domain_name = "cyber.scot"
+          domain_name = "cyber.scot."
           enabled     = true
           metadata    = { key = "value" }
           target_dns_servers = [
@@ -77,7 +77,7 @@ module "resolver" {
         },
         {
           name        = "rule2"
-          domain_name = "cyber.scot"
+          domain_name = "dev.cyber.scot."
           enabled     = true
           metadata    = { key = "value" }
           target_dns_servers = [
