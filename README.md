@@ -24,19 +24,23 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound_endpoint" {
   dynamic "ip_configurations" {
     for_each = var.inbound_endpoint_ip_configurations
     content {
-      private_ip_address_allocation = ip_configurations.value.private_ip_address_allocation
-      subnet_id                     = ip_configurations.value.subnet_id
+      private_ip_allocation_method = ip_configurations.value.private_ip_allocation_method
+      subnet_id                    = ip_configurations.value.subnet_id
     }
   }
 }
 
 resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
-  for_each                                   = { for k, v in var.dns_forwarding_rulesets : k => v if v.create_ruleset == true }
-  name                                       = each.value.name
-  resource_group_name                        = azurerm_private_dns_resolver.resolver.resource_group_name
-  location                                   = azurerm_private_dns_resolver.resolver.location
-  private_dns_resolver_outbound_endpoint_ids = concat([azurerm_private_dns_resolver_outbound_endpoint.outbound_endpoint.id], each.value.outbound_endpoint_ids)
-  tags                                       = azurerm_private_dns_resolver.resolver.tags
+  for_each            = { for k, v in var.dns_forwarding_rulesets : k => v if v.create_ruleset == true }
+  name                = each.value.name
+  resource_group_name = azurerm_private_dns_resolver.resolver.resource_group_name
+  location            = azurerm_private_dns_resolver.resolver.location
+  private_dns_resolver_outbound_endpoint_ids = concat(
+    [azurerm_private_dns_resolver_outbound_endpoint.outbound_endpoint.id],
+    coalesce(each.value.outbound_endpoint_ids, [])
+  )
+
+  tags = azurerm_private_dns_resolver.resolver.tags
 }
 
 locals {
@@ -71,7 +75,7 @@ resource "azurerm_private_dns_resolver_virtual_network_link" "vnet_link" {
   for_each                  = { for k, v in var.dns_forwarding_rulesets : k => v if v.create_ruleset == true }
   name                      = each.value.vnet_link_name != null ? each.value.vnet_link_name : "${each.value.name}-vnet-link"
   dns_forwarding_ruleset_id = azurerm_private_dns_resolver_dns_forwarding_ruleset.ruleset[each.key].id
-  virtual_network_id        = each.value.vnet_id
+  virtual_network_id        = var.vnet_id
   metadata                  = merge(var.tags, each.value.metadata)
 }
 ```
@@ -105,8 +109,8 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_description"></a> [description](#input\_description) | The description attached to AVNM | `string` | `null` | no |
-| <a name="input_dns_forwarding_rulesets"></a> [dns\_forwarding\_rulesets](#input\_dns\_forwarding\_rulesets) | The list of DNS forwarding rulesets | <pre>list(object(<br>    {<br>      create_ruleset        = optional(bool, true)<br>      create_rules          = optional(bool, true)<br>      name                  = string<br>      forwarding_servers    = list(string)<br>      outbound_endpoint_ids = optional(list(string))<br>      vnet_link_name        = optional(string)<br>      vnet_id               = optional(string)<br>      metadata              = optional(map(string))<br>      rules = optional(list(object({<br>        name        = string<br>        domain_name = string<br>        enabled     = optional(bool, true)<br>        metadata    = optional(map(string))<br>        target_dns_servers = list(object({<br>          ip_address = optional(string)<br>          port       = optional(number)<br>        }))<br>        forwarding_port     = optional(number)<br>        forwarding_protocol = optional(string, "TCP")<br>        metadata            = optional(map(string))<br>      })))<br>  }))</pre> | `[]` | no |
-| <a name="input_inbound_endpoint_ip_configurations"></a> [inbound\_endpoint\_ip\_configurations](#input\_inbound\_endpoint\_ip\_configurations) | The list of inbound endpoint ip configurations | <pre>list(object(<br>    {<br>      private_ip_address_allocation = optional(string, "Dynamic")<br>      subnet_id                     = string<br>  }))</pre> | n/a | yes |
+| <a name="input_dns_forwarding_rulesets"></a> [dns\_forwarding\_rulesets](#input\_dns\_forwarding\_rulesets) | The list of DNS forwarding rulesets | <pre>list(object(<br>    {<br>      create_ruleset        = optional(bool, true)<br>      create_rules          = optional(bool, true)<br>      name                  = string<br>      outbound_endpoint_ids = optional(list(string))<br>      vnet_link_name        = optional(string)<br>      metadata              = optional(map(string))<br>      rules = optional(list(object({<br>        name        = string<br>        domain_name = string<br>        enabled     = optional(bool, true)<br>        metadata    = optional(map(string))<br>        target_dns_servers = list(object({<br>          ip_address = optional(string)<br>          port       = optional(number)<br>        }))<br>        forwarding_port     = optional(number)<br>        forwarding_protocol = optional(string, "TCP")<br>      })))<br>  }))</pre> | `[]` | no |
+| <a name="input_inbound_endpoint_ip_configurations"></a> [inbound\_endpoint\_ip\_configurations](#input\_inbound\_endpoint\_ip\_configurations) | The list of inbound endpoint ip configurations | <pre>list(object(<br>    {<br>      private_ip_allocation_method = optional(string, "Dynamic")<br>      subnet_id                    = string<br>  }))</pre> | n/a | yes |
 | <a name="input_inbound_endpoint_name"></a> [inbound\_endpoint\_name](#input\_inbound\_endpoint\_name) | The inbound endpoint name, if you want to set it | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | The location where resources will be created. | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the AVNM instance | `string` | n/a | yes |

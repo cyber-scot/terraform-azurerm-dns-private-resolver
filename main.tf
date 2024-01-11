@@ -23,23 +23,23 @@ resource "azurerm_private_dns_resolver_inbound_endpoint" "inbound_endpoint" {
   dynamic "ip_configurations" {
     for_each = var.inbound_endpoint_ip_configurations
     content {
-      private_ip_allocation_method  = ip_configurations.value.private_ip_allocation_method
-      subnet_id                     = ip_configurations.value.subnet_id
+      private_ip_allocation_method = ip_configurations.value.private_ip_allocation_method
+      subnet_id                    = ip_configurations.value.subnet_id
     }
   }
 }
 
 resource "azurerm_private_dns_resolver_dns_forwarding_ruleset" "ruleset" {
-  for_each                                   = { for k, v in var.dns_forwarding_rulesets : k => v if v.create_ruleset == true }
-  name                                       = each.value.name
-  resource_group_name                        = azurerm_private_dns_resolver.resolver.resource_group_name
-  location                                   = azurerm_private_dns_resolver.resolver.location
+  for_each            = { for k, v in var.dns_forwarding_rulesets : k => v if v.create_ruleset == true }
+  name                = each.value.name
+  resource_group_name = azurerm_private_dns_resolver.resolver.resource_group_name
+  location            = azurerm_private_dns_resolver.resolver.location
   private_dns_resolver_outbound_endpoint_ids = concat(
-  [azurerm_private_dns_resolver_outbound_endpoint.outbound_endpoint.id],
-  coalesce(each.value.outbound_endpoint_ids, [])
-)
+    [azurerm_private_dns_resolver_outbound_endpoint.outbound_endpoint.id],
+    coalesce(each.value.outbound_endpoint_ids, [])
+  )
 
-  tags                                       = azurerm_private_dns_resolver.resolver.tags
+  tags = azurerm_private_dns_resolver.resolver.tags
 }
 
 locals {

@@ -34,7 +34,7 @@ variable "inbound_endpoint_ip_configurations" {
   type = list(object(
     {
       private_ip_allocation_method = optional(string, "Dynamic")
-      subnet_id                     = string
+      subnet_id                    = string
   }))
   description = "The list of inbound endpoint ip configurations"
 }
