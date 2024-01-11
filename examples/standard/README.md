@@ -74,6 +74,18 @@ module "resolver" {
               port       = 53
             }
           ]
+        },
+        {
+          name        = "rule2"
+          domain_name = "cyber.scot"
+          enabled     = true
+          metadata    = { key = "value" }
+          target_dns_servers = [
+            {
+              ip_address = "192.0.5.1"
+              port       = 53
+            }
+          ]
         }
       ]
     }
